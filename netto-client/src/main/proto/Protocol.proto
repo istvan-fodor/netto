@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package org.demo.nettyprotobuf;
+
+
+message Store {
+	bytes body = 1;
+}
+
+message Update {
+	string id = 1;
+	oneof msg {
+		bytes body = 2;
+	}
+}
+
+message Retrieve {
+	string b = 1;
+}
+
+message StoreResponse {
+	bool success = 1;
+	string id = 2;
+	string errorMessage = 3;
+}
+
+message UpdateResponse {
+	bool success = 1;
+	string errorMessage = 2;
+}
+
+message RetrieveResponse {
+	bool success = 1;
+	bool found = 2;
+	string errorMessage = 3;
+	bytes body = 4;
+}
+
+message ClientMessage {
+	oneof msg {
+		Store store = 1;
+		Update update = 2;
+		Retrieve retrieve = 3;
+	}
+}

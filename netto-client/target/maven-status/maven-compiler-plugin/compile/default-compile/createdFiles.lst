@@ -1,0 +1,5 @@
+org/ifodor/netto/client/ClientInterruptedException.class
+org/ifodor/netto/client/ConsumingStreamObserver.class
+org/ifodor/netto/client/NettoClientTest.class
+org/ifodor/netto/client/NettoClient.class
+org/ifodor/netto/client/NoOpStreamObserver.class

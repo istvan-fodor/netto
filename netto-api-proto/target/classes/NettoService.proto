@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package org.ifodor.netto.api;
+
+import "Protocol.proto";
+
+
+service Netto {
+
+  rpc Listen (stream Command) returns (stream StreamMessage) {}
+
+  rpc Publish (PublishEnvelope) returns (Empty) {}
+
+}
+
+message Empty {
+
+}

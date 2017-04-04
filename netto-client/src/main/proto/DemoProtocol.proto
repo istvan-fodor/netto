@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package org.demo.nettyprotobuf.proto;
+
+option optimize_for = SPEED;
+
+message DemoRequest {
+
+  string requestMsg = 1;
+  
+  uint32 count = 2;
+  
+}
+
+message DemoResponse {
+
+  string responseMsg = 1;
+
+  uint32 ret = 2;
+
+}
