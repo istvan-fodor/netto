@@ -20,6 +20,8 @@ public class NettoServiceImpl extends NettoImplBase {
 
   public NettoServiceImpl() {
     subscriptionHandler = new MessageHandler();
+    
+    
   }
 
   @Override
