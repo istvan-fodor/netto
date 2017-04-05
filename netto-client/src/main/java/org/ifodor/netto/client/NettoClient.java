@@ -1,6 +1,8 @@
 package org.ifodor.netto.client;
 
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.ifodor.netto.api.NettoGrpc;
@@ -25,26 +27,31 @@ public class NettoClient {
 
   public NettoClient(String hostname, int port) {
     channel = ManagedChannelBuilder.forAddress(hostname, port).usePlaintext(true).build();
-    client = NettoGrpc.newStub(channel);
+    client = NettoGrpc.newStub(channel).withDeadlineAfter(Long.MAX_VALUE, TimeUnit.DAYS);
   }
-
 
   public void publish(byte[] body, String... streams) {
     if (streams.length > 0) {
-      PublishEnvelope envelope =
-          PublishEnvelope.newBuilder().addData(Datum.newBuilder().setBody(ByteString.copyFrom(body)).build())
-              .addAllChannels(Arrays.asList(streams)).build();
+      PublishEnvelope envelope = PublishEnvelope.newBuilder()
+          .addData(Datum.newBuilder().setBody(ByteString.copyFrom(body)).build()).addAllChannels(Arrays.asList(streams))
+          .build();
       client.publish(envelope, NoOpStreamObserver.getInstance());
     }
   }
 
   public void subscribe(String node, Consumer<byte[]> consumer) {
-    StreamObserver<Command> listen = client.listen(new ConsumingStreamObserver(consumer));
+    CountDownLatch latch = new CountDownLatch(1);
+    StreamObserver<Command> listen = client.listen(new ConsumingStreamObserver(consumer, latch));
     listen.onNext(Command.newBuilder().setSubscribe(Subscribe.newBuilder().setChannel(node)).build());
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public Subscription unsubscribe(String node, Consumer<byte[]> consumer) {
-    ConsumingStreamObserver observer = new ConsumingStreamObserver(consumer);
+    ConsumingStreamObserver observer = new ConsumingStreamObserver(consumer, null);
     client.listen(observer);
     return observer.getSubscription();
   }

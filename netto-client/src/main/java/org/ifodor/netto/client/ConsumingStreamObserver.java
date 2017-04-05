@@ -2,6 +2,7 @@ package org.ifodor.netto.client;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -21,7 +22,10 @@ public class ConsumingStreamObserver implements StreamObserver<Protocol.StreamMe
 
   private BlockingQueue<Subscription> blockingQueue;
 
-  public ConsumingStreamObserver(@NonNull Consumer<byte[]> consumer) {
+  private CountDownLatch latch;
+
+  public ConsumingStreamObserver(@NonNull Consumer<byte[]> consumer, CountDownLatch latch) {
+    this.latch = latch;
     this.consumer = consumer;
     this.blockingQueue = new ArrayBlockingQueue<>(1);
   }
@@ -37,7 +41,9 @@ public class ConsumingStreamObserver implements StreamObserver<Protocol.StreamMe
   @Override
   public void onNext(StreamMessage value) {
     if (value.getMsgCase().equals(StreamMessage.MsgCase.SUBSCRIPTION)) {
-
+      if (latch != null) {
+        latch.countDown();
+      }
     } else {
       onNext(value.getData());
     }

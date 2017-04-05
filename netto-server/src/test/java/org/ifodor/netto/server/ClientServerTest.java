@@ -2,46 +2,41 @@ package org.ifodor.netto.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.concurrent.BrokenBarrierException;
 
 import org.ifodor.netto.client.NettoClient;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import lombok.extern.slf4j.Slf4j;
 
 
-@RunWith(JUnitPlatform.class)
+@Slf4j
+@RunWith(SpringRunner.class)
+@SpringBootTest(properties = "server.port=9500")
 public class ClientServerTest {
 
+  @Value("${server.port}")
   private int port;
 
+  @Autowired
   private NettoServer server;
 
-  @BeforeEach
-  public void init() throws IOException, InterruptedException, BrokenBarrierException {
-    port = getOpenPort();
-    server = new NettoServer(port);
-    server.start();
-  }
-
-  @AfterEach
-  public void stop() throws InterruptedException {
-    server.stop();
-    server.awaitTermination();
-  }
-
-  public int getOpenPort() throws IOException {
-    ServerSocket sock = new ServerSocket(0);
-    int port = sock.getLocalPort();
-    sock.close();
-    return port;
-  }
-
   @Test
-  public void testUpdate() {
-    NettoClient client = new NettoClient("127.0.0.1", port);
+  public void testUpdate() throws InterruptedException {
+    NettoClient client = new NettoClient("localhost", port);
+    client.subscribe("helloworld", bytes -> {
+      log.info("received message: {}", new String(bytes));
+    });
+    NettoClient publishclient = new NettoClient("localhost", port);
+    publishclient.publish("Hello World - 1".getBytes(), "helloworld");
+    publishclient.publish("Hello World - 2".getBytes(), "helloworld");
+    publishclient.publish("Hello Isti - 1".getBytes(), "helloisti");
+    
+    Thread.sleep(1000000l);
     
   }
 }

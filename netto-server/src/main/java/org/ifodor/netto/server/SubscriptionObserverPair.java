@@ -1,18 +1,23 @@
 package org.ifodor.netto.server;
 
+import java.util.Base64;
+
 import org.ifodor.netto.api.Protocol.StreamMessage;
-import org.ifodor.netto.api.Protocol.Subscription;
 
 import io.grpc.stub.StreamObserver;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 @Builder
 public class SubscriptionObserverPair {
   
-  private Subscription subscription;
+  private final @NonNull String channel;
 
-  private StreamObserver<StreamMessage> streamObserver;
-  
+  private final @NonNull StreamObserver<StreamMessage> streamObserver;
+
+  public String base64ChannelName() {
+    return Base64.getEncoder().encodeToString(getChannel().getBytes());
+  }
 }

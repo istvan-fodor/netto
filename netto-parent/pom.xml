@@ -1,6 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.5.2.RELEASE</version>
+  </parent>
 
   <groupId>com.ifodor</groupId>
   <artifactId>netto-parent</artifactId>
@@ -18,13 +23,12 @@
     <protobuf-java.version>3.2.0</protobuf-java.version>
     <grpc-java.version>1.2.0</grpc-java.version>
     <logback.version>1.2.2</logback.version>
-    <junit.version>5.0.0-M3</junit.version>
+    <junit.jupiter.version>5.0.0-M4</junit.jupiter.version>
     <junit-vintage.version>4.12.0-M3</junit-vintage.version>
     <lombok.version>1.16.16</lombok.version>
     <commons-lang.version>3.5</commons-lang.version>
     <disruptor.version>3.3.6</disruptor.version>
     <akka.version>2.5.0-RC2</akka.version>
-    <spring.version>5.0.0.M5</spring.version>
 
     <!-- Maven Plugins -->
     <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
@@ -60,24 +64,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven-surefire-plugin.version}</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.junit.platform</groupId>
-              <artifactId>junit-platform-surefire-provider</artifactId>
-              <version>${junit-platform.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.junit.jupiter</groupId>
-              <artifactId>junit-jupiter-engine</artifactId>
-              <version>${junit.version}</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-
-        <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
             <source>${java.version}</source>
@@ -99,6 +85,12 @@
       </dependency>
 
       <dependency>
+        <groupId>com.typesafe.akka</groupId>
+        <artifactId>akka-slf4j_2.11</artifactId>
+        <version>${akka.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
         <version>${spring.version}</version>
@@ -107,6 +99,12 @@
       <dependency>
         <groupId>io.grpc</groupId>
         <artifactId>grpc-netty</artifactId>
+        <version>${grpc-java.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-okhttp</artifactId>
         <version>${grpc-java.version}</version>
       </dependency>
 
@@ -162,14 +160,14 @@
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
-        <version>${junit.version}</version>
+        <version>${junit.jupiter.version}</version>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-engine</artifactId>
-        <version>${junit.version}</version>
+        <version>${junit.jupiter.version}</version>
         <scope>test</scope>
       </dependency>
 

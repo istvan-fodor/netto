@@ -1,50 +1,73 @@
 package org.ifodor.netto.server;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Base64;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.ifodor.netto.api.NettoGrpc.NettoImplBase;
 import org.ifodor.netto.api.NettoService.Empty;
 import org.ifodor.netto.api.Protocol.Command;
 import org.ifodor.netto.api.Protocol.PublishEnvelope;
 import org.ifodor.netto.api.Protocol.StreamMessage;
+import org.ifodor.netto.api.Protocol.Subscription;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
+import akka.actor.ActorSystem;
+import akka.actor.Inbox;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
+import scala.concurrent.duration.FiniteDuration;
 
 @Slf4j
+@Component
 public class NettoServiceImpl extends NettoImplBase {
 
-  private final MessageHandler subscriptionHandler;
+  private ActorSystem system;
 
-  public NettoServiceImpl() {
-    subscriptionHandler = new MessageHandler();
-    
-    
+  private ActorRef registry;
+
+  @Autowired
+  public NettoServiceImpl(ActorSystem system, @Qualifier("registry") ActorRef registry) {
+    this.system = system;
+    this.registry = registry;
   }
 
   @Override
   public StreamObserver<Command> listen(StreamObserver<StreamMessage> responseObserver) {
     return new StreamObserver<Command>() {
+
       @Override
       public void onNext(Command command) {
         if (command.getCmdCase().equals(Command.CmdCase.SUBSCRIBE)) {
           log.info("Subscribe");
-          subscriptionHandler.subscribe(command.getSubscribe(), responseObserver);
+          Inbox reply = Inbox.create(system);
+          reply.send(registry, SubscriptionObserverPair.builder().channel(command.getSubscribe().getChannel())
+              .streamObserver(responseObserver).build());
+          try {
+            String ok = (String) reply.receive(FiniteDuration.create(1l, TimeUnit.MINUTES));
+            responseObserver
+                .onNext(StreamMessage.newBuilder().setSubscription(Subscription.getDefaultInstance()).build());
+          } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+          }
         } else if (command.getCmdCase().equals(Command.CmdCase.UNSUBSCRIBE)) {
-          // TODO: implement unsubscribe
+
         }
       }
 
       @Override
       public void onError(Throwable t) {
-        // TODO Auto-generated method stub
+
       }
 
       @Override
       public void onCompleted() {
-        // TODO Auto-generated method stub
+        responseObserver.onCompleted();
+        log.info("Completed!");
       }
     };
   }
@@ -53,6 +76,11 @@ public class NettoServiceImpl extends NettoImplBase {
   public void publish(PublishEnvelope request, StreamObserver<Empty> responseObserver) {
     log.info("Publish");
     responseObserver.onNext(Empty.getDefaultInstance());
-    subscriptionHandler.publish(request);
+    for (String channel : request.getChannelsList()) {
+      ActorSelection actorSelection = system
+          .actorSelection(String.format("/user/registry/%s", Base64.getEncoder().encodeToString(channel.getBytes())));
+      request.getDataList().forEach(datum -> actorSelection.tell(datum, null));
+    }
+
   }
 }

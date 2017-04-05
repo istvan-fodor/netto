@@ -10,6 +10,8 @@
   
   <logger name="io.netty.handler.logging.LoggingHandler" level="info" />
   
+  <logger name="com.ifodor" level="debug" />
+  
   <root level="info">
     <appender-ref ref="STDOUT" />
   </root>
