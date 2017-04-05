@@ -2,7 +2,6 @@ language: java
 jdk:
   - oraclejdk8
 before_install:
-  - apt-get update
   - apt-get install wget unzip -y
   - wget -p $HOME https://github.com/google/protobuf/releases/download/v3.2.0/protoc-3.2.0-linux-x86_64.zip
   - unzip -d $HOME/protobuf $HOME/protoc-3.2.0-linux-x86_64.zip
