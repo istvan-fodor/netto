@@ -23,6 +23,8 @@
     <lombok.version>1.16.16</lombok.version>
     <commons-lang.version>3.5</commons-lang.version>
     <disruptor.version>3.3.6</disruptor.version>
+    <akka.version>2.5.0-RC2</akka.version>
+    <spring.version>5.0.0.M5</spring.version>
 
     <!-- Maven Plugins -->
     <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
@@ -91,6 +93,12 @@
     <dependencies>
 
       <dependency>
+        <groupId>com.typesafe.akka</groupId>
+        <artifactId>akka-actor_2.11</artifactId>
+        <version>${akka.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>io.grpc</groupId>
         <artifactId>grpc-netty</artifactId>
         <version>${grpc-java.version}</version>
@@ -106,12 +114,6 @@
         <groupId>io.grpc</groupId>
         <artifactId>grpc-stub</artifactId>
         <version>${grpc-java.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-all</artifactId>
-        <version>${netty.version}</version>
       </dependency>
 
       <dependency>

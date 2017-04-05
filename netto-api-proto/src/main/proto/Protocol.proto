@@ -4,7 +4,8 @@ package org.ifodor.netto.api;
 
 // ----
 message Subscribe {
-	string channel = 1;
+	string clientId = 1;
+	string channel = 2;
 }
 
 message Unsubscribe {
@@ -20,7 +21,8 @@ message Command {
 
 message Subscription {
 	string subscriptionId = 1;
-	string token = 2;
+	string channel = 2;
+	string token = 3;
 }
 
 message Datum {

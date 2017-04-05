@@ -3,25 +3,23 @@ package org.ifodor.netto.server;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.ifodor.netto.api.NettoGrpc.NettoImplBase;
 import org.ifodor.netto.api.NettoService.Empty;
 import org.ifodor.netto.api.Protocol.Command;
-import org.ifodor.netto.api.Protocol.Datum;
 import org.ifodor.netto.api.Protocol.PublishEnvelope;
 import org.ifodor.netto.api.Protocol.StreamMessage;
-import org.ifodor.netto.api.Protocol.Subscribe;
-import org.ifodor.netto.api.Protocol.Subscription;
 
 import io.grpc.stub.StreamObserver;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class NettoServiceImpl extends NettoImplBase {
 
-  public Map<String, Queue<StreamObserver<Datum>>> subscriptions = null;
+  private final MessageHandler subscriptionHandler;
 
   public NettoServiceImpl() {
-    subscriptions = new ConcurrentHashMap<>();
+    subscriptionHandler = new MessageHandler();
   }
 
   @Override
@@ -30,7 +28,10 @@ public class NettoServiceImpl extends NettoImplBase {
       @Override
       public void onNext(Command command) {
         if (command.getCmdCase().equals(Command.CmdCase.SUBSCRIBE)) {
-          Subscription subscription = subscribe(command.getSubscribe());
+          log.info("Subscribe");
+          subscriptionHandler.subscribe(command.getSubscribe(), responseObserver);
+        } else if (command.getCmdCase().equals(Command.CmdCase.UNSUBSCRIBE)) {
+          // TODO: implement unsubscribe
         }
       }
 
@@ -46,14 +47,10 @@ public class NettoServiceImpl extends NettoImplBase {
     };
   }
 
-  private Subscription subscribe(Subscribe subscribe) {
-    // TODO Auto-generated method stub
-    return null;
-
-  }
-
   @Override
   public void publish(PublishEnvelope request, StreamObserver<Empty> responseObserver) {
+    log.info("Publish");
     responseObserver.onNext(Empty.getDefaultInstance());
+    subscriptionHandler.publish(request);
   }
 }
