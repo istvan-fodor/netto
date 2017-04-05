@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = "server.port=9500")
+@SpringBootTest(properties = "server.port=9500", classes = Netto.class)
 public class ClientServerTest {
 
   @Value("${server.port}")
@@ -31,10 +31,9 @@ public class ClientServerTest {
     client.subscribe("helloworld", bytes -> {
       log.info("received message: {}", new String(bytes));
     });
-    NettoClient publishclient = new NettoClient("localhost", port);
-    publishclient.publish("Hello World - 1".getBytes(), "helloworld");
-    publishclient.publish("Hello World - 2".getBytes(), "helloworld");
-    publishclient.publish("Hello Isti - 1".getBytes(), "helloisti");
+    client.publish("Hello World - 1".getBytes(), "helloworld");
+    client.publish("Hello World - 2".getBytes(), "helloworld");
+    client.publish("Hello Isti - 1".getBytes(), "helloisti");
     
     Thread.sleep(1000000l);
     
