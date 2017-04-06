@@ -31,8 +31,8 @@ public class ClientServerTest {
   private int port = 1;
   
   @After
-  public void stop() {
-    
+  public void stop() throws InterruptedException {
+    Thread.sleep(1000l);
   }
   
   @Test
@@ -40,18 +40,17 @@ public class ClientServerTest {
     NettoClient client = new NettoClient("localhost", port);
     
     client.subscribe("helloworld", bytes -> {
-      
       log.info("received message: {}", new String(bytes));
     });
     client.publish("Hello World - 1".getBytes(), "helloworld");
     client.publish("Hello World - 2".getBytes(), "helloworld");
     client.publish("Hello Isti - 1".getBytes(), "helloisti");
     Thread.sleep(500l);
+    
     client.subscribe("helloisti", bytes -> {
       log.info("received message: {}", new String(bytes));
     });
     client.publish("Hello Isti - 2".getBytes(), "helloisti");
-    
   }
 }
 

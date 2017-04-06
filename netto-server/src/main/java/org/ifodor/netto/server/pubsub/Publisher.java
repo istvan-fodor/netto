@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.ifodor.netto.api.Protocol.Datum;
 import org.ifodor.netto.api.Protocol.StreamMessage;
-import org.springframework.util.Assert;
 
 import akka.actor.AbstractActor;
 import akka.event.Logging;
@@ -28,8 +27,8 @@ public class Publisher extends AbstractActor {
 
   @Override
   public Receive createReceive() {
-    return ReceiveBuilder.create().match(ChannelObserverPair.class, this::register)
-        .match(Datum.class, this::publish).build();
+    return ReceiveBuilder.create().match(ChannelObserverPair.class, this::register).match(Datum.class, this::publish)
+        .match(FinnishedProtocol.CompleteAll.class, this::completeAll).build();
   }
 
   protected void register(ChannelObserverPair pair) {
@@ -45,5 +44,13 @@ public class Publisher extends AbstractActor {
   protected void publish(Datum pair) {
     StreamMessage msg = StreamMessage.newBuilder().setData(pair).build();
     observers.forEach(observer -> observer.onNext(msg));
+  }
+
+  protected void completeAll(FinnishedProtocol.CompleteAll msg) {
+    log.debug("Closing all observers on channel {}", channel);
+    observers.forEach(observer -> observer.onCompleted());
+    sender().tell(
+        FinnishedProtocol.CompletedAll.builder().channel(channel).numberOfObserversClosed(observers.size()).build(),
+        self());
   }
 }

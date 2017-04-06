@@ -21,9 +21,12 @@ public class NettoServer {
   
   private int port;
 
+  private NettoServiceImpl nettoService;
+
   @Autowired
   public NettoServer(@Value("${server.port}") int port, NettoServiceImpl nettoService) throws IOException {
     this.port = port;
+    this.nettoService = nettoService;
     server = ServerBuilder.forPort(port).addService(nettoService).build();
   }
 
@@ -35,6 +38,7 @@ public class NettoServer {
 
   @PreDestroy
   public void stop() throws InterruptedException {
+    nettoService.closeAll();
     server.shutdownNow();
     server.awaitTermination();
   }
