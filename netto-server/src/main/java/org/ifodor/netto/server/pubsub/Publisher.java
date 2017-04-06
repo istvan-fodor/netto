@@ -1,4 +1,4 @@
-package org.ifodor.netto.server;
+package org.ifodor.netto.server.pubsub;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +28,11 @@ public class Publisher extends AbstractActor {
 
   @Override
   public Receive createReceive() {
-    return ReceiveBuilder.create().match(SubscriptionObserverPair.class, this::register)
+    return ReceiveBuilder.create().match(ChannelObserverPair.class, this::register)
         .match(Datum.class, this::publish).build();
   }
 
-  protected void register(SubscriptionObserverPair pair) {
+  protected void register(ChannelObserverPair pair) {
     log.debug("Registering subscriber to channel {}", pair.getChannel());
     if (!pair.getChannel().equals(channel)) {
       log.error("Tried to subscribe to channel {} in {} channel's actor! Dropping message!", pair.getChannel(),

@@ -1,4 +1,4 @@
-package org.ifodor.netto.server;
+package org.ifodor.netto.server.pubsub;
 
 import java.util.Base64;
 
@@ -11,7 +11,7 @@ import lombok.NonNull;
 
 @Data
 @Builder
-public class SubscriptionObserverPair {
+public class ChannelObserverPair {
   
   private final @NonNull String channel;
 

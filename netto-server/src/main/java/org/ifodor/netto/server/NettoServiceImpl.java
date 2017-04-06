@@ -10,6 +10,7 @@ import org.ifodor.netto.api.Protocol.Command;
 import org.ifodor.netto.api.Protocol.PublishEnvelope;
 import org.ifodor.netto.api.Protocol.StreamMessage;
 import org.ifodor.netto.api.Protocol.Subscription;
+import org.ifodor.netto.server.pubsub.ChannelObserverPair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -45,7 +46,7 @@ public class NettoServiceImpl extends NettoImplBase {
         if (command.getCmdCase().equals(Command.CmdCase.SUBSCRIBE)) {
           log.info("Subscribe");
           Inbox reply = Inbox.create(system);
-          reply.send(registry, SubscriptionObserverPair.builder().channel(command.getSubscribe().getChannel())
+          reply.send(registry, ChannelObserverPair.builder().channel(command.getSubscribe().getChannel())
               .streamObserver(responseObserver).build());
           try {
             String ok = (String) reply.receive(FiniteDuration.create(1l, TimeUnit.MINUTES));
@@ -76,6 +77,7 @@ public class NettoServiceImpl extends NettoImplBase {
   public void publish(PublishEnvelope request, StreamObserver<Empty> responseObserver) {
     log.info("Publish");
     responseObserver.onNext(Empty.getDefaultInstance());
+    responseObserver.onCompleted();
     for (String channel : request.getChannelsList()) {
       ActorSelection actorSelection = system
           .actorSelection(String.format("/user/registry/%s", Base64.getEncoder().encodeToString(channel.getBytes())));

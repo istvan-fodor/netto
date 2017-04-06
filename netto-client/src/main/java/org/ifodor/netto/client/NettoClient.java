@@ -15,9 +15,11 @@ import org.ifodor.netto.api.Protocol.Subscription;
 
 import com.google.protobuf.ByteString;
 
+import io.grpc.LoadBalancer.Helper;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+import io.grpc.util.RoundRobinLoadBalancerFactory;
 
 public class NettoClient {
 

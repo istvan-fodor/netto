@@ -1,4 +1,4 @@
-package org.ifodor.netto.server;
+package org.ifodor.netto.server.pubsub;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,10 +22,10 @@ public class Registry extends AbstractActor {
 
   @Override
   public Receive createReceive() {
-    return ReceiveBuilder.create().match(SubscriptionObserverPair.class, this::register).build();
+    return ReceiveBuilder.create().match(ChannelObserverPair.class, this::register).build();
   }
 
-  private void register(SubscriptionObserverPair pair) {
+  private void register(ChannelObserverPair pair) {
     if (!localPublishers.containsKey(pair.getChannel())) {
       log.debug("Creating publisher actor for channel {}", pair.getChannel());
       ActorRef channelChild = getContext().actorOf(Props.create(Publisher.class, pair.getChannel()),
