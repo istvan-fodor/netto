@@ -1,5 +1,22 @@
+env:
+  global:
+  - secure: B+u0x0v4fra5eSrHtiYyyGPv65Ocz8PDuLVxVnQv2Nsw6gV8aM2O4u8MGaS70rYyoiTcuNOt9Zz8n0w7e58gufamvLTyenHn/zjGvzjCpGemb1GZ+q0ImSvrw1imqSaMN0k9RPO8gJjghkbp23ycLxF7rbpjEbU4txIj0OfJy5fzaNn$
+  - secure: 5gNpdMPC/RX4ozlNunVXKcZdS7qWfEDGtkHhROf0h+H2HV5HOSgc/NaFJjqi5+Jl4SkttB90ZBPJbtCMvDmRi0u0n8v7CPJ+3/3GijAbfyJPmqQiBta3txEfEbBZB7/A2q6Z83YkmkcfAHoicAHubZvopHQXt3MTjuUcrTFIia6WLKm$
+  - secure: 6G4D5Pb/Lnts4G1sP4yr4V/4kZ4dr6L69aT52+Nio8dQFfLMAjjGr8E4TlgNkxTAAIfAuuWbVpADNf72kjVkbky1F4fFcyWgPVZ2Q+zqaa1l4UCw/86lNIFfELN7asb9yIoakD92XGuHO/QHZNUVrwwFeaYu3zhdCO1WIaiAX6env3S$
+
 language: java
+
 jdk:
-  - oraclejdk8
+- oraclejdk8
 
 install: mvn clean install
+
+after_success:
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO=ifodor/netto-server
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -f Dockerfile -t $REPO:$COMMIT .
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
+
