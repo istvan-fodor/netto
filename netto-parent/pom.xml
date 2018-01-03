@@ -20,12 +20,12 @@
     <!-- library dependencies -->
     <slf4j.version>1.7.25</slf4j.version>
     <netty.version>4.1.9.Final</netty.version>
-    <protobuf-java.version>3.2.0</protobuf-java.version>
-    <grpc-java.version>1.2.0</grpc-java.version>
+    <protobuf-java.version>3.5.1</protobuf-java.version>
+    <grpc-java.version>1.8.0</grpc-java.version>
     <logback.version>1.2.2</logback.version>
     <junit.jupiter.version>5.0.0-M4</junit.jupiter.version>
     <junit-vintage.version>4.12.0-M3</junit-vintage.version>
-    <lombok.version>1.16.16</lombok.version>
+    <lombok.version>1.16.18</lombok.version>
     <commons-lang.version>3.5</commons-lang.version>
     <disruptor.version>3.3.6</disruptor.version>
     <akka.version>2.5.0-RC2</akka.version>
