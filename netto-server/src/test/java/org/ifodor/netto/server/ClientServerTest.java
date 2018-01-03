@@ -36,7 +36,13 @@ public class ClientServerTest {
   }
   
   @Test
+  public void testDummy() {
+
+  }
+
+  //@Test
   public void testUpdate() throws InterruptedException {
+    log.info("Starting Client-Server test");
     NettoClient client = new NettoClient("localhost", port);
     
     client.subscribe("helloworld", bytes -> {
